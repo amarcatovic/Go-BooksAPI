@@ -9,20 +9,6 @@ import (
 	"github.com/gorilla/mux"
 )
 
-// Structs
-type Book struct {
-	ID     string  `json:"id"`
-	Isbn   string  `json:"isbn"`
-	Title  string  `json:"title"`
-	Author *Author `json:"author"`
-}
-
-type Author struct {
-	ID        string `json:"id"`
-	FirstName string `json:"firstname"`
-	LastName  string `json:"lastname"`
-}
-
 // TODO : Implement DB
 var books []Book
 
@@ -30,7 +16,7 @@ var books []Book
 	Function that returns all the books
 */
 func getBooks(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set(contentType, applicationJson)
 	json.NewEncoder(w).Encode(books)
 }
 
@@ -38,7 +24,7 @@ func getBooks(w http.ResponseWriter, r *http.Request) {
 	Function that returns the book by its id
 */
 func getBook(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set(contentType, applicationJson)
 	params := mux.Vars(r)
 
 	for _, book := range books {
@@ -76,11 +62,11 @@ func main() {
 	books = append(books, Book{ID: "3", Isbn: "45678321", Title: "Book Three", Author: &Author{ID: "2", FirstName: "Ivo", LastName: "Andrić"}})
 
 	// Handlers
-	router.HandleFunc("/api/books", getBooks).Methods("GET")
-	router.HandleFunc("/api/book/{id}", getBook).Methods("GET")
-	router.HandleFunc("/api/books", createBook).Methods("POST")
-	router.HandleFunc("/api/books/{id}", updateBook).Methods("PUT")
-	router.HandleFunc("/api/books/{id}", deleteBook).Methods("DELETE")
+	router.HandleFunc(booksPath, getBooks).Methods(getRequest)
+	router.HandleFunc(booksPathWithId, getBook).Methods(getRequest)
+	router.HandleFunc(booksPath, createBook).Methods(postRequest)
+	router.HandleFunc(booksPathWithId, updateBook).Methods(putRequest)
+	router.HandleFunc(booksPathWithId, deleteBook).Methods(deleteRequest)
 
-	log.Fatal(http.ListenAndServe(":8000", router))
+	log.Fatal(http.ListenAndServe(port, router))
 }
